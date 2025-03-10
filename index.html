@@ -10,13 +10,19 @@
     <div id="scene-container"></div>
 
     <div id="node-creation">
-        <button data-category="Trigger">Trigger</button>
-        <button data-category="Thoughts">Thoughts</button>
-        <button data-category="Theme">Theme</button>
-        <button data-category="Feeling">Feeling</button>
-        <button data-category="Whys">Whys</button>
-        <button data-category="Solutions">Solutions</button>
-        <button data-category="Root Emotions">Root Emotions</button>
+        <div id="node-type-selection">
+            <button data-category="Trigger" class="node-type-btn">Trigger</button>
+            <button data-category="Thoughts" class="node-type-btn">Thoughts</button>
+            <button data-category="Theme" class="node-type-btn">Theme</button>
+            <button data-category="Feeling" class="node-type-btn">Feeling</button>
+            <button data-category="Whys" class="node-type-btn">Whys</button>
+            <button data-category="Solutions" class="node-type-btn">Solutions</button>
+            <button data-category="Root Emotions" class="node-type-btn">Root Emotions</button>
+        </div>
+        <div id="node-creation-controls">
+            <input type="text" id="node-notes" placeholder="Enter notes for the node...">
+            <button id="add-node-btn" disabled>Add Node</button>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>

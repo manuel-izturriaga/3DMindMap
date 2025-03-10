@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeInfoPane = null;
     const infoPanes = new Map(); // Map to store node -> info pane relationships
     
+    // Variables for node creation
+    let selectedNodeType = null;
+    
     // Create save/load container
     const saveLoadContainer = document.createElement('div');
     saveLoadContainer.id = 'save-load-container';
@@ -659,16 +662,43 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load button event
     loadButton.addEventListener('click', loadMindMap);
 
-    // Node creation logic
-    const nodeCreationButtons = document.querySelectorAll('#node-creation button');
-    nodeCreationButtons.forEach(button => {
+    // Node creation logic - updated for new workflow
+    const nodeTypeButtons = document.querySelectorAll('.node-type-btn');
+    const nodeNotesInput = document.getElementById('node-notes');
+    const addNodeButton = document.getElementById('add-node-btn');
+    
+    // Node type selection
+    nodeTypeButtons.forEach(button => {
         button.addEventListener('click', () => {
-            const category = button.dataset.category;
-            createNode(category);
+            // Remove selected class from all buttons
+            nodeTypeButtons.forEach(btn => btn.classList.remove('selected'));
+            
+            // Add selected class to clicked button
+            button.classList.add('selected');
+            
+            // Store selected category
+            selectedNodeType = button.dataset.category;
+            
+            // Enable add node button
+            addNodeButton.disabled = false;
         });
     });
+    
+    // Add node button
+    addNodeButton.addEventListener('click', () => {
+        if (!selectedNodeType) return;
+        
+        // Get notes from input
+        const notes = nodeNotesInput.value.trim();
+        
+        // Create node with selected type and notes
+        createNode(selectedNodeType, notes);
+        
+        // Clear input field
+        nodeNotesInput.value = '';
+    });
 
-    function createNode(category) {
+    function createNode(category, notes = '') {
         let geometry;
         let material;
         let color;
@@ -721,7 +751,7 @@ document.addEventListener('DOMContentLoaded', () => {
         node.userData = {
             category: category,
             isHighlighted: false,
-            notes: ''
+            notes: notes
         };
 
         // Random position

@@ -198,6 +198,23 @@ document.addEventListener('DOMContentLoaded', () => {
         notes.addEventListener('input', () => {
             node.userData.notes = notes.value;
         });
+
+        // Create delete button
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete Node';
+        deleteButton.style.backgroundColor = '#f44336';
+        deleteButton.style.color = 'white';
+        deleteButton.style.border = 'none';
+        deleteButton.style.borderRadius = '3px';
+        deleteButton.style.padding = '5px 10px';
+        deleteButton.style.cursor = 'pointer';
+        deleteButton.style.float = 'left';
+        infoPane.appendChild(deleteButton);
+    
+        // Delete button event
+        deleteButton.addEventListener('click', () => {
+            deleteNode(node, nodes, scene, connections, infoPanes);
+        });
         
         // Create close button
         const closeButton = document.createElement('button');
@@ -479,6 +496,37 @@ document.addEventListener('DOMContentLoaded', () => {
         nodes.push(node);
         
         return node;
+    }
+
+    // Function to delete a node and its connections
+    function deleteNode(node, nodes, scene, connections, infoPanes) {
+        // Remove connections associated with the node
+        for (let i = connections.length - 1; i >= 0; i--) {
+            const connection = connections[i];
+            if (connection.nodeA === node || connection.nodeB === node) {
+                scene.remove(connection.line);
+                connection.line.geometry.dispose();
+                connection.line.material.dispose();
+                connections.splice(i, 1);
+            }
+        }
+        
+        // Remove the node from the scene and the nodes array
+        scene.remove(node);
+        node.geometry.dispose();
+        node.material.dispose();
+        
+        const index = nodes.indexOf(node);
+        if (index > -1) {
+            nodes.splice(index, 1);
+        }
+        
+        // Remove the info pane
+        if (infoPanes.has(node)) {
+            const infoPane = infoPanes.get(node);
+            document.body.removeChild(infoPane);
+            infoPanes.delete(node);
+        }
     }
 
     // Animation loop

@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
     controls.dampingFactor = 0.05;
     controls.screenSpacePanning = false;
-    controls.minDistance = 10;
+    controls.minDistance = 5;
     controls.maxDistance = 50; // Increased max distance
     
     // Store all nodes for selection
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const roomSize = 30; // Increased room size
     const roomHeight = 20;
     const roomGeometry = new THREE.BoxGeometry(roomSize, roomHeight, roomSize);
-    const roomMaterial = new THREE.MeshLambertMaterial({ color: 0x808080, side: THREE.BackSide }); // Grey color
+    const roomMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff, side: THREE.BackSide }); // Grey color
     const room = new THREE.Mesh(roomGeometry, roomMaterial);
     scene.add(room);
 
@@ -133,16 +133,15 @@ document.addEventListener('DOMContentLoaded', () => {
     scene.add(ambientLight);
 
     // Point light above the node
-    const pointLight = new THREE.PointLight(0xffffff, 0.5, 20); // Reduced intensity, increased distance
-    pointLight.position.set(0, 8, 0); // Increased height
+    const pointLight = new THREE.PointLight(0xffffff, 1, 2); // Reduced intensity, increased distance
     scene.add(pointLight);
 
     // Directional lights
-    const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.3);
+    const directionalLight1 = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight1.position.set(5, 10, 5);
     scene.add(directionalLight1);
 
-    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.3);
+    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight2.position.set(-5, 10, -5);
     scene.add(directionalLight2);
 
@@ -173,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Create title based on node category
         const title = document.createElement('h3');
-        title.textContent = node.userData.category;
+        title.textContent = node.userData.title;
         title.style.margin = '0 0 10px 0';
         title.style.borderBottom = '1px solid rgba(255, 255, 255, 0.3)';
         title.style.paddingBottom = '5px';
@@ -282,9 +281,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Create line material
         const material = new THREE.LineBasicMaterial({ 
             color: 0xffffff,
-            opacity: 0.7,
+            opacity: 1,
             transparent: true,
-            linewidth: 1
+            linewidth: 3
         });
         
         // Create the line
@@ -297,6 +296,10 @@ document.addEventListener('DOMContentLoaded', () => {
             nodeB: nodeB,
             line: line
         });
+        
+        // Update node sizes
+        updateNodeSize(nodeA);
+        updateNodeSize(nodeB);
     }
     
     // Function to update connection lines
@@ -372,10 +375,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // Create nodes
                     data.nodes.forEach(nodeData => {
-                        const node = createNodeFromData(
+                        const node = createNode(
                             nodeData.category, 
                             nodeData.position,
-                            nodeData.notes
+                            nodeData.notes,
+                            nodeData.title,
+                            true // loadedData flag
                         );
                     });
                     
@@ -426,77 +431,6 @@ document.addEventListener('DOMContentLoaded', () => {
         nodes.length = 0;
     }
     
-    // Function to create a node from loaded data
-    function createNodeFromData(category, position, notes) {
-        let geometry;
-        let material;
-        let color;
-        const nodeSize = 0.3; // Reduced node size
-
-        switch (category) {
-            case 'Trigger':
-                geometry = new THREE.BoxGeometry(nodeSize, nodeSize, nodeSize);
-                color = 0xff0000; // Red
-                break;
-            case 'Thoughts':
-                geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
-                color = 0x00ff00; // Green
-                break;
-            case 'Theme':
-                geometry = new THREE.ConeGeometry( nodeSize, nodeSize * 2, 32 );
-                color = 0x0000ff; // Blue
-                break;
-            case 'Feeling':
-                geometry = new THREE.CylinderGeometry( nodeSize, nodeSize, nodeSize * 2, 32 );
-                color = 0xffff00; // Yellow
-                break;
-            case 'Whys':
-                geometry = new THREE.TetrahedronGeometry(nodeSize);
-                color = 0xff00ff; // Magenta
-                break;
-            case 'Solutions':
-                geometry = new THREE.OctahedronGeometry(nodeSize);
-                color = 0x00ffff; // Cyan
-                break;
-            case 'Root Emotions':
-                geometry = new THREE.DodecahedronGeometry(nodeSize);
-                color = 0xffa500; // Orange
-                break;
-            default:
-                geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
-                color = 0xffffff; // White
-                break;
-        }
-
-        material = new THREE.MeshLambertMaterial({ 
-            color: color,
-            emissive: 0x000000,
-            emissiveIntensity: 0.5
-        });
-        
-        const node = new THREE.Mesh(geometry, material);
-        
-        // Add user data for node information
-        node.userData = {
-            category: category,
-            isHighlighted: false,
-            notes: notes || ''
-        };
-
-        // Set position
-        node.position.set(
-            position.x,
-            position.y,
-            position.z
-        );
-
-        scene.add(node);
-        
-        // Add to nodes array for selection
-        nodes.push(node);
-        
-        return node;
-    }
 
     // Function to delete a node and its connections
     function deleteNode(node, nodes, scene, connections, infoPanes) {
@@ -529,6 +463,140 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Helper function to calculate node size based on connections
+    function calculateNodeSize(node) {
+        const baseSize = 0.2;
+        const connectionCount = connections.filter(conn => conn.nodeA === node || conn.nodeB === node).length;
+        const sizeIncrease = connectionCount * 0.05; // Adjust the multiplier as needed
+        return baseSize + sizeIncrease;
+    }
+
+    function createNode(category, position = '', notes = '', title = '', loadedData = false) {
+        let geometry;
+        let material;
+        let color;
+        let nodeSize = 0.2; // Reduced node size
+
+        // Calculate node size based on connections
+        
+
+        switch (category) {
+            case 'Trigger':
+                geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
+                color = 0xff0000; // Red
+                break;
+            case 'Thoughts':
+                geometry = new THREE.DodecahedronGeometry(nodeSize);
+                color = 0x00ff00; // Green
+                break;
+            case 'Theme':
+                geometry = new THREE.BoxGeometry(nodeSize, nodeSize, nodeSize);
+                color = 0x0000ff; // Blue
+                break;
+            case 'Feeling':
+                geometry = new THREE.IcosahedronGeometry(nodeSize);
+                color = 0xffff00; // Yellow
+                break;
+            case 'Whys':
+                geometry = new THREE.CapsuleGeometry(nodeSize,nodeSize,2,8);
+                color = 0xff00ff; // Magenta
+                break;
+            case 'Solutions':
+                geometry = new THREE.OctahedronGeometry(nodeSize,2);
+                color = 0x00ffff; // Cyan
+                break;
+            case 'Root Emotions':
+                geometry = new THREE.SphereGeometry(nodeSize, 20, 15);
+                color = 0xffa500; // Orange
+                break;
+            default:
+                geometry = new THREE.SphereGeometry(nodeSize, 20, 15);
+                color = 0xffffff; // White
+                break;
+        }
+
+        material = new THREE.MeshStandardMaterial({ 
+            color: color,
+            emissive: 0x000000,
+            roughness: 0,
+            metalness: 1,
+            flatShading: true
+        });
+        
+        const node = new THREE.Mesh(geometry, material);
+        
+        // Add user data for node information
+
+        
+        node.userData = {
+            category: category,
+            title: title,
+            isHighlighted: false,
+            notes: notes
+        };
+
+        if (loadedData) {
+            // Set position from loaded data
+            node.position.set(
+                position.x,
+                position.y,
+                position.z
+            );
+        }
+        else {
+            // Random position
+            node.position.set(
+                Math.random() * 6 - 3,
+                Math.random() * 4,
+                Math.random() * 6 - 3
+            );
+        }
+        
+
+        scene.add(node);
+        
+        // Add to nodes array for selection
+        nodes.push(node);
+        
+        return node;
+    }
+
+    // Function to update node size
+    function updateNodeSize(node) {
+        const newNodeSize = calculateNodeSize(node);
+        let newGeometry;
+
+        switch (node.userData.category) {
+            case 'Trigger':
+                newGeometry = new THREE.BoxGeometry(newNodeSize, newNodeSize, newNodeSize);
+                break;
+            case 'Thoughts':
+                newGeometry = new THREE.SphereGeometry(newNodeSize, 32, 32);
+                break;
+            case 'Theme':
+                newGeometry = new THREE.ConeGeometry(newNodeSize, newNodeSize * 2, 32);
+                break;
+            case 'Feeling':
+                newGeometry = new THREE.CylinderGeometry(newNodeSize, newNodeSize, newNodeSize * 2, 32);
+                break;
+            case 'Whys':
+                newGeometry = new THREE.TetrahedronGeometry(newNodeSize);
+                break;
+            case 'Solutions':
+                newGeometry = new THREE.OctahedronGeometry(newNodeSize);
+                break;
+            case 'Root Emotions':
+                newGeometry = new THREE.DodecahedronGeometry(newNodeSize);
+                break;
+            default:
+                newGeometry = new THREE.SphereGeometry(newNodeSize, 32, 32);
+                break;
+        }
+
+        node.geometry.dispose();
+        node.geometry = newGeometry;
+    }
+    
     // Animation loop
     function animate() {
         requestAnimationFrame(animate);
@@ -737,83 +805,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!selectedNodeType) return;
         
         // Get notes from input
-        const notes = nodeNotesInput.value.trim();
+        const titleInput = nodeNotesInput.value.trim();
         
         // Create node with selected type and notes
-        createNode(selectedNodeType, notes);
+        createNode(selectedNodeType, title=titleInput);
         
         // Clear input field
         nodeNotesInput.value = '';
     });
-
-    function createNode(category, notes = '') {
-        let geometry;
-        let material;
-        let color;
-        const nodeSize = 0.3; // Reduced node size
-
-        switch (category) {
-            case 'Trigger':
-                geometry = new THREE.BoxGeometry(nodeSize, nodeSize, nodeSize);
-                color = 0xff0000; // Red
-                break;
-            case 'Thoughts':
-                geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
-                color = 0x00ff00; // Green
-                break;
-            case 'Theme':
-                geometry = new THREE.ConeGeometry( nodeSize, nodeSize * 2, 32 );
-                color = 0x0000ff; // Blue
-                break;
-            case 'Feeling':
-                geometry = new THREE.CylinderGeometry( nodeSize, nodeSize, nodeSize * 2, 32 );
-                color = 0xffff00; // Yellow
-                break;
-            case 'Whys':
-                geometry = new THREE.TetrahedronGeometry(nodeSize);
-                color = 0xff00ff; // Magenta
-                break;
-            case 'Solutions':
-                geometry = new THREE.OctahedronGeometry(nodeSize);
-                color = 0x00ffff; // Cyan
-                break;
-            case 'Root Emotions':
-                geometry = new THREE.DodecahedronGeometry(nodeSize);
-                color = 0xffa500; // Orange
-                break;
-            default:
-                geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
-                color = 0xffffff; // White
-                break;
-        }
-
-        material = new THREE.MeshLambertMaterial({ 
-            color: color,
-            emissive: 0x000000,
-            emissiveIntensity: 0.5
-        });
-        
-        const node = new THREE.Mesh(geometry, material);
-        
-        // Add user data for node information
-        node.userData = {
-            category: category,
-            isHighlighted: false,
-            notes: notes
-        };
-
-        // Random position
-        node.position.set(
-            Math.random() * 6 - 3,
-            Math.random() * 4,
-            Math.random() * 6 - 3
-        );
-
-        scene.add(node);
-        
-        // Add to nodes array for selection
-        nodes.push(node);
-        
-        return node;
-    }
 });

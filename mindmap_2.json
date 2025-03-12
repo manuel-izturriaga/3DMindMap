@@ -1,0 +1,54 @@
+{
+  "nodes": [
+    {
+      "category": "Trigger",
+      "notes": "",
+      "position": {
+        "x": 0.9765560515247547,
+        "y": 2.117755748970218,
+        "z": -0.26995657473959733
+      }
+    },
+    {
+      "category": "Thoughts",
+      "notes": "",
+      "position": {
+        "x": 1.6123654001118117,
+        "y": 3.384457305384,
+        "z": -0.7176579315464688
+      }
+    },
+    {
+      "category": "Trigger",
+      "notes": "",
+      "position": {
+        "x": -2.288797863833672,
+        "y": 3.308378064111464,
+        "z": 1.4321096716269688
+      }
+    },
+    {
+      "category": "Theme",
+      "notes": "",
+      "position": {
+        "x": -0.24676209685316097,
+        "y": 2.5835081027107494,
+        "z": 1.059385627137245
+      }
+    }
+  ],
+  "connections": [
+    {
+      "nodeAIndex": 1,
+      "nodeBIndex": 0
+    },
+    {
+      "nodeAIndex": 1,
+      "nodeBIndex": 2
+    },
+    {
+      "nodeAIndex": 1,
+      "nodeBIndex": 3
+    }
+  ]
+}

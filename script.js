@@ -515,12 +515,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
         }
 
-        material = new THREE.MeshStandardMaterial({ 
+        material = new THREE.MeshLambertMaterial({ 
             color: color,
-            emissive: 0x000000,
-            roughness: 0,
-            metalness: 1,
-            flatShading: true
+            emissive_color: 0x000000,
+            //emiss
+            //roughness: 0,
+            //metalness: 1,
+            //flatShading: true
         });
         
         const node = new THREE.Mesh(geometry, material);

@@ -551,12 +551,23 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         }
         else {
+            // Get the camera's position and direction
+            const cameraPosition = new THREE.Vector3();
+            cameraPosition.copy(camera.position);
+            const cameraDirection = new THREE.Vector3();
+            camera.getWorldDirection(cameraDirection);
+
+            // Calculate the node's position in front of the camera
+            const nodePosition = new THREE.Vector3();
+            nodePosition.copy(cameraPosition).add(cameraDirection.multiplyScalar(5)); 
+            
+            node.position.copy(nodePosition); // Set the position of the node
             // Random position
-            node.position.set(
-                Math.random() * 6 - 3,
-                Math.random() * 4,
-                Math.random() * 6 - 3
-            );
+            //node.position.set(
+           //    Math.random() * 6 - 3,
+            //    Math.random() * 4,
+           //     Math.random() * 6 - 3
+            //);
         }
         
 

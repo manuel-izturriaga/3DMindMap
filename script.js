@@ -1,7 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Scene setup
     const scene = new THREE.Scene();
+
+    // Camera setup
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    
+    // Renderer setup
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById('scene-container').appendChild(renderer.domElement);
@@ -98,10 +102,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Orbit controls
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
-    controls.dampingFactor = 0.05;
-    controls.screenSpacePanning = false;
-    controls.minDistance = 5;
-    controls.maxDistance = 50; // Increased max distance
+    //controls.dampingFactor = 0.05;
+    //controls.screenSpacePanning = false;
+    //controls.minDistance = 5;
+    //controls.maxDistance = 50; // Increased max distance
     
     // Store all nodes for selection
     const nodes = [];
@@ -187,9 +191,11 @@ document.addEventListener('DOMContentLoaded', () => {
         notes.style.color = 'white';
         notes.style.border = '1px solid rgba(255, 255, 255, 0.3)';
         notes.style.borderRadius = '3px';
+        notes.style.width = 'auto';
         notes.style.padding = '5px';
+        notes.style.resize = 'vertical';
         notes.style.margin = '5px';
-    
+         
         infoPane.appendChild(notes);
         
         // Save notes to node userData when changed
@@ -482,31 +488,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
         switch (category) {
             case 'Trigger':
-                geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
+                geometry = new THREE.OctahedronGeometry(nodeSize);
                 color = 0xff0000; // Red
                 break;
             case 'Event/Thought':
-                geometry = new THREE.DodecahedronGeometry(nodeSize);
+                geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
                 color = 0x00ff00; // Green
                 break;
             case 'Theme':
-                geometry = new THREE.BoxGeometry(nodeSize, nodeSize, nodeSize);
+                geometry = new THREE.DodecahedronGeometry(nodeSize*1.3);
                 color = 0x0000ff; // Blue
                 break;
             case 'Feeling':
-                geometry = new THREE.IcosahedronGeometry(nodeSize);
+                geometry = new THREE.IcosahedronGeometry(nodeSize*1.2);
                 color = 0xffff00; // Yellow
                 break;
             case 'Whys':
-                geometry = new THREE.CapsuleGeometry(nodeSize,nodeSize,2,8);
+                geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
                 color = 0xff00ff; // Magenta
                 break;
             case 'Solutions':
-                geometry = new THREE.OctahedronGeometry(nodeSize,2);
+                geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
                 color = 0x00ffff; // Cyan
                 break;
             case 'Raw Emotion':
-                geometry = new THREE.SphereGeometry(nodeSize, 20, 15);
+                geometry = new THREE.TorusGeometry(nodeSize, nodeSize/2,12, 20);
                 color = 0xffa500; // Orange
                 break;
             default:
@@ -562,41 +568,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return node;
     }
 
-    // Function to update node size
-    function updateNodeSize(node) {
-        const newNodeSize = calculateNodeSize(node);
-        let newGeometry;
-
-        switch (node.userData.category) {
-            case 'Trigger':
-                newGeometry = new THREE.BoxGeometry(newNodeSize, newNodeSize, newNodeSize);
-                break;
-            case 'Thoughts':
-                newGeometry = new THREE.SphereGeometry(newNodeSize, 32, 32);
-                break;
-            case 'Theme':
-                newGeometry = new THREE.ConeGeometry(newNodeSize, newNodeSize * 2, 32);
-                break;
-            case 'Feeling':
-                newGeometry = new THREE.CylinderGeometry(newNodeSize, newNodeSize, newNodeSize * 2, 32);
-                break;
-            case 'Whys':
-                newGeometry = new THREE.TetrahedronGeometry(newNodeSize);
-                break;
-            case 'Solutions':
-                newGeometry = new THREE.OctahedronGeometry(newNodeSize);
-                break;
-            case 'Root Emotions':
-                newGeometry = new THREE.DodecahedronGeometry(newNodeSize);
-                break;
-            default:
-                newGeometry = new THREE.SphereGeometry(newNodeSize, 32, 32);
-                break;
-        }
-
-        node.geometry.dispose();
-        node.geometry = newGeometry;
-    }
     
     // Animation loop
     function animate() {

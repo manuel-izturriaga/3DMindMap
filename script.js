@@ -174,6 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const title = document.createElement('h3');
         title.textContent = node.userData.title;
         title.style.margin = '0 0 10px 0';
+        title.style.alignContent = 'center';
         title.style.borderBottom = '1px solid rgba(255, 255, 255, 0.3)';
         title.style.paddingBottom = '5px';
         infoPane.appendChild(title);
@@ -182,15 +183,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const notes = document.createElement('textarea');
         notes.placeholder = 'Add your notes here...';
         notes.value = node.userData.notes || '';
-        notes.style.width = '100%';
-        notes.style.height = '80px';
         notes.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
         notes.style.color = 'white';
         notes.style.border = '1px solid rgba(255, 255, 255, 0.3)';
         notes.style.borderRadius = '3px';
         notes.style.padding = '5px';
-        notes.style.marginBottom = '10px';
-        notes.style.resize = 'vertical';
+        notes.style.margin = '5px';
+    
         infoPane.appendChild(notes);
         
         // Save notes to node userData when changed
@@ -298,8 +297,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         // Update node sizes
-        updateNodeSize(nodeA);
-        updateNodeSize(nodeB);
+        //updateNodeSize(nodeA);
+        //updateNodeSize(nodeB);
     }
     
     // Function to update connection lines
@@ -472,6 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function createNode(category, position = '', notes = '', title = '', loadedData = false) {
+        console.log('Creating node with category:', category, 'position:', position, 'notes:', notes, 'title:', title);
         let geometry;
         let material;
         let color;
@@ -485,7 +485,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
                 color = 0xff0000; // Red
                 break;
-            case 'Thoughts':
+            case 'Event/Thought':
                 geometry = new THREE.DodecahedronGeometry(nodeSize);
                 color = 0x00ff00; // Green
                 break;
@@ -505,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 geometry = new THREE.OctahedronGeometry(nodeSize,2);
                 color = 0x00ffff; // Cyan
                 break;
-            case 'Root Emotions':
+            case 'Raw Emotion':
                 geometry = new THREE.SphereGeometry(nodeSize, 20, 15);
                 color = 0xffa500; // Orange
                 break;
@@ -781,7 +781,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Node creation logic - updated for new workflow
     const nodeTypeButtons = document.querySelectorAll('.node-type-btn');
-    const nodeNotesInput = document.getElementById('node-notes');
+    
     const addNodeButton = document.getElementById('add-node-btn');
     
     // Node type selection
@@ -804,14 +804,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add node button
     addNodeButton.addEventListener('click', () => {
         if (!selectedNodeType) return;
+        const nodeTitleInput = document.getElementById('node-title-input');
         
-        // Get notes from input
-        const titleInput = nodeNotesInput.value.trim();
+        if (nodeTitleInput) {
+            
+            const titleInput = nodeTitleInput.value.trim();
+            console.log('Creating node with title:', titleInput);
+            createNode(selectedNodeType, undefined, undefined, titleInput);
+        } else {
+            console.error('Node title input element not found');
+        }
         
-        // Create node with selected type and notes
-        createNode(selectedNodeType, title=titleInput);
-        
-        // Clear input field
-        nodeNotesInput.value = '';
     });
 });

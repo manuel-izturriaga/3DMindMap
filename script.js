@@ -571,6 +571,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 geometry = new THREE.IcosahedronGeometry(nodeSize*1.2);
                 color = 0xffff00; // Yellow
                 break;
+            case 'Evidence':
+                geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
+                switch (evidence) {
+                    case 'Supportive':
+                        color = 0xffffff; // Green
+                    case 'Conflicting':
+                        color = 0x000000; // Black
+                }
+                break;
             case 'Questions':
                 geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
                 color = 0xff00ff; // Magenta

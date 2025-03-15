@@ -1,0 +1,203 @@
+{
+  "nodes": [
+    {
+      "category": "Trigger",
+      "notes": "External event or situation that initiates the emotional process.",
+      "position": {
+        "x": 4.184256618524046,
+        "y": 1.8829408188087686,
+        "z": 4.301765305002478
+      }
+    },
+    {
+      "category": "Raw Emotion",
+      "notes": "The initial, unfiltered emotional response.  Often instinctual.",
+      "position": {
+        "x": 3.281779332945878,
+        "y": 0.8104240799230492,
+        "z": 3.316507323433934
+      }
+    },
+    {
+      "category": "Feeling",
+      "notes": "The conscious awareness and interpretation of the raw emotion.",
+      "position": {
+        "x": 3.880115758392716,
+        "y": -0.2922803859294627,
+        "z": 4.432380909457803
+      }
+    },
+    {
+      "category": "Event/Thought",
+      "notes": "Specific thought or event associated with the trigger.",
+      "position": {
+        "x": 3.5008142673657385,
+        "y": 0.7503615825318815,
+        "z": 5.359513492761462
+      }
+    },
+    {
+      "category": "Theme",
+      "notes": "Underlying pattern or recurring idea related to the emotional experience.",
+      "position": {
+        "x": 2.296172188038754,
+        "y": -0.47958506940691326,
+        "z": 5.777616231448141
+      }
+    },
+    {
+      "category": "Behavior",
+      "notes": "The outward action or reaction resulting from the emotional process.",
+      "position": {
+        "x": 5.5,
+        "y": -1.0,
+        "z": 4.0
+      }
+    },
+    {
+      "category": "Cognitive Appraisal",
+      "notes": "The mental process of evaluating the trigger and its significance.",
+      "position": {
+        "x": 2.0,
+        "y": 2.5,
+        "z": 3.0
+      }
+    },
+    {
+      "category": "Physiological Response",
+      "notes": "Bodily changes associated with the emotion (e.g., increased heart rate).",
+      "position": {
+        "x": 4.5,
+        "y": 3.0,
+        "z": 2.5
+      }
+    },
+    {
+      "category": "Coping Mechanism",
+      "notes": "Strategies used to manage or deal with the emotion.",
+      "position": {
+        "x": 6.0,
+        "y": 1.0,
+        "z": 2.0
+      }
+    },
+      {
+      "category": "Past Experience",
+      "notes": "How has prior experience with this theme played a role",
+      "position": {
+        "x": 1.0,
+        "y": -1.5,
+        "z": 6.0
+      }
+    },
+    {
+      "category": "Long-Term Impact",
+      "notes": "Potential long-term effects of the emotional experience.",
+      "position": {
+        "x": 7.0,
+        "y": -2.0,
+        "z": 5.0
+      }
+    },
+    {
+      "category": "Underlying Belief",
+      "notes": "The core beliefs that might contribute to the Theme.",
+      "position": {
+        "x": 1.5,
+        "y": -1.0,
+        "z": 4.5
+      }
+    },
+      {
+      "category": "Intensity",
+      "notes": "Represents the strength of feeling",
+      "position": {
+        "x": 5,
+        "y": -2,
+        "z": 2
+      }
+    },
+      {
+      "category": "Alternative Perspective",
+      "notes": "Challenging whether the initial thought is accurate or considering other perspectives.",
+      "position": {
+        "x": 1,
+        "y": 2,
+        "z": 6
+      }
+    },
+      {
+      "category": "Need",
+      "notes": "Identifying the Underlying need that is connected to the emotion",
+      "position": {
+        "x": 6,
+        "y": 3,
+        "z": 5
+      }
+    }
+
+  ],
+  "connections": [
+    {
+      "nodeAIndex": 0,
+      "nodeBIndex": 1
+    },
+    {
+      "nodeAIndex": 0,
+      "nodeBIndex": 3
+    },
+    {
+      "nodeAIndex": 3,
+      "nodeBIndex": 2
+    },
+    {
+      "nodeAIndex": 3,
+      "nodeBIndex": 4
+    },
+    {
+      "nodeAIndex": 1,
+      "nodeBIndex": 2
+    },
+    {
+      "nodeAIndex": 2,
+      "nodeBIndex": 5
+    },
+    {
+      "nodeAIndex": 0,
+      "nodeBIndex": 6
+    },
+    {
+      "nodeAIndex": 0,
+      "nodeBIndex": 7
+    },
+    {
+      "nodeAIndex": 5,
+      "nodeBIndex": 8
+    },
+    {
+        "nodeAIndex": 4,
+        "nodeBIndex": 9
+    },
+     {
+        "nodeAIndex": 5,
+        "nodeBIndex": 10
+    },
+    {
+        "nodeAIndex": 4,
+        "nodeBIndex": 11
+    },
+    {
+        "nodeAIndex": 2,
+        "nodeBIndex": 12
+    },
+    {
+        "nodeAIndex": 3,
+        "nodeBIndex": 13
+    },
+    {
+        "nodeAIndex": 1,
+        "nodeBIndex": 14
+    }
+
+  ]
+}

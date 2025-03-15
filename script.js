@@ -110,6 +110,53 @@ document.addEventListener('DOMContentLoaded', () => {
     // Store all nodes for selection
     const nodes = [];
 
+    let showAllInfoPanes = false;
+
+    // Create toggle all info panes button
+    const toggleAllInfoPanesButton = document.createElement('button');
+    toggleAllInfoPanesButton.textContent = 'Show All Titles';
+    toggleAllInfoPanesButton.style.position = 'absolute';
+    toggleAllInfoPanesButton.style.top = '50px';
+    toggleAllInfoPanesButton.style.right = '10px';
+    toggleAllInfoPanesButton.style.zIndex = '100';
+    toggleAllInfoPanesButton.style.padding = '8px 12px';
+    toggleAllInfoPanesButton.style.backgroundColor = '#2196F3';
+    toggleAllInfoPanesButton.style.color = 'white';
+    toggleAllInfoPanesButton.style.border = 'none';
+    toggleAllInfoPanesButton.style.borderRadius = '4px';
+    toggleAllInfoPanesButton.style.cursor = 'pointer';
+    document.body.appendChild(toggleAllInfoPanesButton);
+
+    // Toggle all info panes
+    toggleAllInfoPanesButton.addEventListener('click', () => {
+        showAllInfoPanes = !showAllInfoPanes;
+        console.log('Toggling all info panes:', showAllInfoPanes);
+        toggleAllInfoPanesButton.textContent = showAllInfoPanes ? 'Show Titles: ON' : 'Show Titles: OFF';
+        toggleAllInfoPanesButton.style.backgroundColor = showAllInfoPanes ? '#f44336' : '#2196F3';
+
+        nodes.forEach(node => {
+            if (infoPanes.has(node)) {
+                const infoPane = infoPanes.get(node);
+                console.log('Test', infoPane);
+                const Info = document.getElementsByClassName('node-info-pane');
+                const titleElement = infoPane.querySelector('h3');
+                const infoPaneContent = document.querySelector('.node-info-pane textarea');
+
+                if (showAllInfoPanes) {
+                    // Show all info
+                    console.log(infoPane);
+                    titleElement.style.display = 'block';
+                    infoPanes.style.display
+
+                } else {
+                    // Show titles only
+                    titleElement.style.display = 'none';
+                }
+                updateInfoPanesPositions();
+            }
+        });
+    });
+
     // Room setup (simple box)
     const roomSize = 30; // Increased room size
     const roomHeight = 20;
@@ -195,7 +242,6 @@ document.addEventListener('DOMContentLoaded', () => {
         notes.style.padding = '5px';
         notes.style.resize = 'vertical';
         notes.style.margin = '5px';
-         
         infoPane.appendChild(notes);
         
         // Save notes to node userData when changed
@@ -249,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
         nodes.forEach(node => {
             if (infoPanes.has(node)) {
                 const infoPane = infoPanes.get(node);
-                if (infoPane.style.display !== 'none') {
+                if (showAllInfoPanes || infoPane.style.display !== 'none') {
                     // Convert 3D position to screen position
                     const vector = new THREE.Vector3();
                     vector.setFromMatrixPosition(node.matrixWorld);
@@ -326,6 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = {
             nodes: nodes.map(node => ({
                 category: node.userData.category,
+                title: node.userData.title || 'Untitled',
                 notes: node.userData.notes || '',
                 position: {
                     x: node.position.x,
@@ -559,6 +606,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Calculate the node's position in front of the camera
             const nodePosition = new THREE.Vector3();
+            cameraPosition.x += Math.random() * 0.5 - 0.25;
+            cameraPosition.y += Math.random() * 0.5 - 0.25;
+            cameraPosition.z += Math.random() * 0.5 - 0.25;
             nodePosition.copy(cameraPosition).add(cameraDirection.multiplyScalar(5)); 
             
             node.position.copy(nodePosition); // Set the position of the node
@@ -793,9 +843,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const titleInput = nodeTitleInput.value.trim();
             console.log('Creating node with title:', titleInput);
             createNode(selectedNodeType, undefined, undefined, titleInput);
+            nodeTitleInput.value = '';
         } else {
             console.error('Node title input element not found');
         }
         
+    });
+
+    const nodeTitleInput = document.getElementById('node-title-input');
+    nodeTitleInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            //event.preventDefault(); // Prevent form submission
+            addNodeButton.click(); // Trigger the add node button click event
+        }
     });
 });

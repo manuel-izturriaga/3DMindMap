@@ -62,7 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadButton.style.color = 'white';
     loadButton.style.border = 'none';
     loadButton.style.borderRadius = '4px';
-    loadButton.style.cursor = 'pointer';
     saveLoadContainer.appendChild(loadButton);
     
     // Create connection mode toggle button
@@ -228,6 +227,47 @@ document.addEventListener('DOMContentLoaded', () => {
         title.style.borderBottom = '1px solid rgba(255, 255, 255, 0.3)';
         title.style.paddingBottom = '5px';
         infoPane.appendChild(title);
+
+        // Create category dropdown
+        const categoryDropdown = document.createElement('select');
+        categoryDropdown.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        categoryDropdown.style.color = 'white';
+        categoryDropdown.style.border = '1px solid rgba(255, 255, 255, 0.3)';
+        categoryDropdown.style.borderRadius = '3px';
+        categoryDropdown.style.padding = '5px';
+        categoryDropdown.style.margin = '5px';
+
+        // Get unique categories
+        const uniqueCategories = [...new Set(nodes.map(node => node.userData.category))];
+
+        // Populate dropdown with categories
+        uniqueCategories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category;
+            categoryDropdown.appendChild(option);
+        });
+
+        // Set current category as selected
+        categoryDropdown.value = node.userData.category;
+
+        infoPane.appendChild(categoryDropdown);
+
+        // Category dropdown event listener
+        categoryDropdown.addEventListener('change', () => {
+            node.userData.category = categoryDropdown.value;
+            
+            // Update node geometry and material
+            scene.remove(node);
+            node.geometry.dispose();
+            node.material.dispose();
+            
+            const newNode = createNode(node.userData.category, node.position, node.userData.notes, node.userData.title, true);
+            scene.add(newnode);
+            
+            updateJsonDisplay();
+            updateCategoryFilter();
+        });
         
         // Create text area for notes
         const notes = document.createElement('textarea');

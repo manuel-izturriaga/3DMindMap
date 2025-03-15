@@ -351,6 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update node sizes
         //updateNodeSize(nodeA);
         //updateNodeSize(nodeB);
+        updateJsonDisplay();
     }
     
     // Function to update connection lines
@@ -402,6 +403,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Clean up
         URL.revokeObjectURL(url);
+
+        updateJsonDisplay();
     }
     
     // Function to load the mind map
@@ -455,6 +458,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         fileInput.click();
+
+        updateCategoryFilter();
+        updateJsonDisplay();
     }
     
     // Function to clear the mind map
@@ -625,6 +631,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Add to nodes array for selection
         nodes.push(node);
+
+        updateJsonDisplay();
+        updateCategoryFilter();
         
         return node;
     }
@@ -857,4 +866,97 @@ document.addEventListener('DOMContentLoaded', () => {
             addNodeButton.click(); // Trigger the add node button click event
         }
     });
+
+    // Create category filter dropdown
+    const categoryFilter = document.createElement('select');
+    categoryFilter.id = 'category-filter';
+    categoryFilter.style.position = 'absolute';
+    categoryFilter.style.bottom = '775px';
+    categoryFilter.style.left = '10px';
+    categoryFilter.style.zIndex = '101';
+    document.body.appendChild(categoryFilter);
+
+    // Add default option
+    const defaultOption = document.createElement('option');
+    defaultOption.value = 'all';
+    defaultOption.textContent = 'All Categories';
+    categoryFilter.appendChild(defaultOption);
+
+    // Create JSON display container
+    const jsonDisplayContainer = document.createElement('div');
+    jsonDisplayContainer.id = 'json-display-container';
+    jsonDisplayContainer.style.position = 'absolute';
+    jsonDisplayContainer.style.bottom = '10px';
+    jsonDisplayContainer.style.left = '10px';
+    jsonDisplayContainer.style.zIndex = '100';
+    jsonDisplayContainer.style.width = '300px';
+    jsonDisplayContainer.style.height = '750px';
+    jsonDisplayContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    jsonDisplayContainer.style.color = 'white';
+    jsonDisplayContainer.style.padding = '10px';
+    jsonDisplayContainer.style.borderRadius = '5px';
+    jsonDisplayContainer.style.overflow = 'auto';
+    document.body.appendChild(jsonDisplayContainer);
+
+    // Function to update JSON display
+    function updateJsonDisplay() {
+        const selectedCategory = categoryFilter.value;
+
+        let filteredNodes = nodes;
+
+        if (selectedCategory !== 'all') {
+            filteredNodes = nodes.filter(node => node.userData.category === selectedCategory);
+        }
+
+        const data = {
+            nodes: filteredNodes.map(node => ({
+                category: node.userData.category,
+                title: node.userData.title || 'Untitled',
+                notes: node.userData.notes || '',
+                //position: {
+                //    x: node.position.x,
+                //    y: node.position.y,
+                //    z: node.position.z
+                //}
+            })),
+            connections: connections.map(conn => ({
+                nodeAIndex: nodes.indexOf(conn.nodeA),
+                nodeBIndex: nodes.indexOf(conn.nodeB)
+            }))
+        };
+        
+        // Convert to JSON string
+        const jsonString = JSON.stringify(data, null, 2);
+		
+		// Format the JSON for pretty display
+        jsonDisplayContainer.innerHTML = '<pre>' + jsonString + '</pre>';
+        console.log('Updated JSON display:', jsonString);
+    }
+
+    // Listen for changes in the category filter
+    categoryFilter.addEventListener('change', updateJsonDisplay);
+
+    // Function to update category filter dropdown
+    function updateCategoryFilter() {
+        // Clear existing options
+        categoryFilter.innerHTML = '';
+
+        // Add default option
+        const defaultOption = document.createElement('option');
+        defaultOption.value = 'all';
+        defaultOption.textContent = 'All Categories';
+        categoryFilter.appendChild(defaultOption);
+
+        // Get unique categories from nodes
+        const uniqueCategories = [...new Set(nodes.map(node => node.userData.category))];
+
+        // Populate dropdown with categories
+        uniqueCategories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category;
+            categoryFilter.appendChild(option);
+        });
+    }
+
 });

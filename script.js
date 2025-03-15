@@ -134,26 +134,25 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleAllInfoPanesButton.textContent = showAllInfoPanes ? 'Show Titles: ON' : 'Show Titles: OFF';
         toggleAllInfoPanesButton.style.backgroundColor = showAllInfoPanes ? '#f44336' : '#2196F3';
 
-        nodes.forEach(node => {
-            if (infoPanes.has(node)) {
-                const infoPane = infoPanes.get(node);
-                console.log('Test', infoPane);
-                const Info = document.getElementsByClassName('node-info-pane');
-                const titleElement = infoPane.querySelector('h3');
-                const infoPaneContent = document.querySelector('.node-info-pane textarea');
+        
+        infoPanes.forEach((infoPane, node) => {
+            console.log('Info pane:', infoPane);
+            const titleElement = infoPane.querySelector('h3');
+            const titleText = titleElement ? titleElement.textContent : 'No title found';
+            console.log('Title:', titleText);
+            const notesElement = infoPane.querySelector('textarea');
+            const deleteButton = infoPane.querySelector('button:nth-child(3)');
+            const closeButton = infoPane.querySelector('button:last-child');
 
-                if (showAllInfoPanes) {
-                    // Show all info
-                    console.log(infoPane);
-                    titleElement.style.display = 'block';
-                    infoPanes.style.display
-
-                } else {
-                    // Show titles only
-                    titleElement.style.display = 'none';
-                }
-                updateInfoPanesPositions();
+            if (showAllInfoPanes) {
+                // Show all info
+                infoPane.style.display = 'block';
+                console.log('WE MADE IT IN HERE')
+                titleElement.style.display = 'block';
+            } else {
+                infoPane.style.display = 'none';
             }
+            updateInfoPanesPositions();
         });
     });
 
@@ -304,6 +303,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     const x = (vector.x * 0.5 + 0.5) * window.innerWidth;
                     const y = (-vector.y * 0.5 + 0.5) * window.innerHeight;
                     
+                    // Calculate distance from camera
+                    const distance = camera.position.distanceTo(node.position);
+                    
+                    // Calculate scale factor (adjust these values as needed)
+                    const baseScale = 1;
+                    const maxScale = 2;
+                    const minScale = 0.5;
+                    const scale = Math.max(minScale, Math.min(maxScale, baseScale / (distance / 10))); // Adjust divisor for scaling speed
+                    
+                    // Apply scale to info pane
+                    infoPane.style.transform = `scale(${scale})`;
+                    infoPane.style.width = `${200 / scale}px`; // Adjust base width
+                    infoPane.style.height = `${150 / scale}px`; // Adjust base height
+                    infoPane.style.fontSize = `${12 / scale}px`; // Adjust base font size
+                    
                     // Position the info pane next to the node
                     infoPane.style.left = `${x + 20}px`;
                     infoPane.style.top = `${y - 20}px`;
@@ -437,6 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             nodeData.title,
                             true // loadedData flag
                         );
+                        createInfoPane(node);
                     });
                     
                     // Create connections
@@ -530,7 +545,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function createNode(category, position = '', notes = '', title = '', loadedData = false) {
-        console.log('Creating node with category:', category, 'position:', position, 'notes:', notes, 'title:', title);
+        //console.log('Creating node with category:', category, 'position:', position, 'notes:', notes, 'title:', title);
         let geometry;
         let material;
         let color;
@@ -556,7 +571,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 geometry = new THREE.IcosahedronGeometry(nodeSize*1.2);
                 color = 0xffff00; // Yellow
                 break;
-            case 'Whys':
+            case 'Questions':
                 geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
                 color = 0xff00ff; // Magenta
                 break;
@@ -930,7 +945,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		
 		// Format the JSON for pretty display
         jsonDisplayContainer.innerHTML = '<pre>' + jsonString + '</pre>';
-        console.log('Updated JSON display:', jsonString);
     }
 
     // Listen for changes in the category filter

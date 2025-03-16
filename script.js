@@ -135,19 +135,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         
         infoPanes.forEach((infoPane, node) => {
-            console.log('Info pane:', infoPane);
             const titleElement = infoPane.querySelector('h3');
-            const titleText = titleElement ? titleElement.textContent : 'No title found';
-            console.log('Title:', titleText);
             const notesElement = infoPane.querySelector('textarea');
-            const deleteButton = infoPane.querySelector('button:nth-child(3)');
-            const closeButton = infoPane.querySelector('button:last-child');
-
+            const deleteButton = infoPane.querySelector('#delete-button');
+            const closeButton = infoPane.querySelector('#close-button');
+            const categoryDropdown = infoPane.querySelector('select');
+    
+            // Always set infoPane to block first
+            infoPane.style.display = 'block';
+    
             if (showAllInfoPanes) {
-                // Show all info
-                infoPane.style.display = 'block';
-                console.log('WE MADE IT IN HERE')
+                // Show title, notes, and buttons
                 titleElement.style.display = 'block';
+                notesElement.style.display = 'none';
+                deleteButton.style.display = 'none'; // Or 'block' depending on desired layout
+                closeButton.style.display = 'none'; // Or 'block'
+                categoryDropdown.style.display = 'none';
             } else {
                 infoPane.style.display = 'none';
             }
@@ -247,6 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Create title based on node category
         const title = document.createElement('h3');
+        title.id = 'title';
         title.textContent = node.userData.title;
         title.style.margin = '0 0 10px 0';
         title.style.alignContent = 'center';
@@ -316,6 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Create delete button
         const deleteButton = document.createElement('button');
+        deleteButton.id = 'delete-button';
         deleteButton.textContent = 'Delete Node';
         deleteButton.style.backgroundColor = '#f44336';
         deleteButton.style.color = 'white';
@@ -333,6 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Create close button
         const closeButton = document.createElement('button');
+        closeButton.id = 'close-button';
         closeButton.textContent = 'Close';
         closeButton.style.backgroundColor = '#f44336';
         closeButton.style.color = 'white';
@@ -380,10 +386,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // Apply scale to info pane
                     infoPane.style.transform = `scale(${scale})`;
-                    infoPane.style.width = `${200 / scale}px`; // Adjust base width
-                    infoPane.style.height = `${150 / scale}px`; // Adjust base height
-                    infoPane.style.fontSize = `${12 / scale}px`; // Adjust base font size
-                    
+
+                    const maxWidth = 200; // Maximum width in pixels
+                    const maxHeight = 150; // Maximum height in pixels
+
+                    // Calculate scaled dimensions
+                    const scaledWidth = maxWidth / scale;
+                    const scaledHeight = maxHeight / scale;
+
+
+                    infoPane.style.width = '50px';//`${scaledWidth}px`;
+                    infoPane.style.height = '50px;'//`${scaledHeight}px`;
+                    infoPane.style.fontSize = `${12 / scale}px`;
+
                     // Position the info pane next to the node
                     infoPane.style.left = `${x + 20}px`;
                     infoPane.style.top = `${y - 20}px`;

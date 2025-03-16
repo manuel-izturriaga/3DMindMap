@@ -639,12 +639,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'Evidence':
                 geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
-                switch (evidence) {
-                    case 'Supportive':
+                //switch (evidence) {
+                //    case 'Supportive':
                         color = 0xffffff; // Green
-                    case 'Conflicting':
-                        color = 0x000000; // Black
-                }
+                //    case 'Conflicting':
+                //        color = 0x000000; // Black
+                //}
                 break;
             case 'Questions':
                 geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
@@ -778,7 +778,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const clickedNode = intersects[0].object;
             
             // Handle right-click for dragging
-            if (event.button === 2) {
+            if (event.button === 1) {
                 // Only allow dragging if not in connecting mode
                 if (!isConnectingMode) {
                     // Disable orbit controls during dragging

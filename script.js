@@ -198,6 +198,32 @@ document.addEventListener('DOMContentLoaded', () => {
     camera.position.set(0, 5, 14); // Adjusted position
     controls.update();
 
+    // Store initial camera position and target
+    const initialCameraPosition = new THREE.Vector3().copy(camera.position);
+    const initialControlsTarget = new THREE.Vector3().copy(controls.target);
+
+    // Create return to start button
+    const returnToStartButton = document.createElement('button');
+    returnToStartButton.textContent = 'Return to Start';
+    returnToStartButton.style.position = 'absolute';
+    returnToStartButton.style.top = '10px';
+    returnToStartButton.style.left = '10px';
+    returnToStartButton.style.zIndex = '100';
+    returnToStartButton.style.padding = '8px 12px';
+    returnToStartButton.style.backgroundColor = '#4CAF50';
+    returnToStartButton.style.color = 'white';
+    returnToStartButton.style.border = 'none';
+    returnToStartButton.style.borderRadius = '4px';
+    returnToStartButton.style.cursor = 'pointer';
+    document.body.appendChild(returnToStartButton);
+
+    // Return to start button event listener
+    returnToStartButton.addEventListener('click', () => {
+        camera.position.copy(initialCameraPosition);
+        controls.target.copy(initialControlsTarget);
+        controls.update();
+    });
+
     // Function to create an info pane for a node
     function createInfoPane(node) {
         // Check if pane already exists

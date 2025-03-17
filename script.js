@@ -352,8 +352,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // Close button event
         closeButton.addEventListener('click', () => {
             infoPane.style.display = 'none';
-            activeInfoPane = null;
+            activeInfoPane = false;
         });
+
+        // Last Edited (Read-only for now)
+        const lastEditedLabel = document.createElement('p');
+        lastEditedLabel.textContent = `Last Edited: ${node.userData.lastEdited ? node.userData.lastEdited : 'Not yet edited'}`;
+        lastEditedLabel.style.margin = '5px 0';
+        infoPane.appendChild(lastEditedLabel);
         
         // Store the pane in the map
         infoPanes.set(node, infoPane);
@@ -395,8 +401,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const scaledHeight = maxHeight / scale;
 
 
-                    infoPane.style.width = '50px';//`${scaledWidth}px`;
-                    infoPane.style.height = '50px;'//`${scaledHeight}px`;
+                    infoPane.style.width = `${scaledWidth}px`;
+                    infoPane.style.height = `${scaledHeight}px`;
                     infoPane.style.fontSize = `${12 / scale}px`;
 
                     // Position the info pane next to the node
@@ -632,6 +638,10 @@ document.addEventListener('DOMContentLoaded', () => {
         let color;
         let nodeSize = 0.2; // Reduced node size
 
+        const now = new Date();
+        const timestamp = now.toISOString(); // Use ISO format for date
+        const dateString = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
         // Calculate node size based on connections
         
 
@@ -697,7 +707,10 @@ document.addEventListener('DOMContentLoaded', () => {
             category: category,
             title: title,
             isHighlighted: false,
-            notes: notes
+            notes: notes,
+            dateAdded: timestamp,
+            lastEdited: null,
+            resolved: false
         };
 
         if (loadedData) {
@@ -737,6 +750,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Add to nodes array for selection
         nodes.push(node);
 
+        createInfoPane(node);
         updateJsonDisplay();
         updateCategoryFilter();
         
@@ -792,7 +806,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (intersects.length > 0) {
             const clickedNode = intersects[0].object;
             
-            // Handle right-click for dragging
+            // Handle middle-click for dragging
             if (event.button === 1) {
                 // Only allow dragging if not in connecting mode
                 if (!isConnectingMode) {
@@ -840,13 +854,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } else {
                     // Show info pane for the clicked node
-                    if (activeInfoPane) {
+                    if (activeInfoPane || (clickedNode === sourceNode)) {
                         activeInfoPane.style.display = 'none';
+                    } else {
+                        activePane = infoPanes.get(clickedNode);
+                        //Update Here
                     }
-                    
-                    const infoPane = createInfoPane(clickedNode);
-                    infoPane.style.display = 'block';
-                    activeInfoPane = infoPane;
                     
                     // Update position
                     const vector = new THREE.Vector3();
@@ -856,8 +869,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const x = (vector.x * 0.5 + 0.5) * window.innerWidth;
                     const y = (-vector.y * 0.5 + 0.5) * window.innerHeight;
                     
-                    infoPane.style.left = `${x + 20}px`;
-                    infoPane.style.top = `${y - 20}px`;
+                    activePane.style.left = `${x + 20}px`;
+                    activePane.style.top = `${y - 20}px`;
                 }
             }
         } else if (isConnectingMode && sourceNode) {

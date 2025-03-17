@@ -98,44 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Orbit controls
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
-    //controls.dampingFactor = 0.05;
-    //controls.screenSpacePanning = false;
-    //controls.minDistance = 5;
-    //controls.maxDistance = 50; // Increased max distance
-    
-    // Store all nodes for selection
-    const nodes = [];
-
-    let showAllInfoPanes = false;
-
-    // Function to update info pane visibility
-    function updateInfoPaneVisibility(showAll) {
-        infoPanes.forEach((infoPane, node) => {
-            const titleElement = infoPane.querySelector('#title');
-            const contentElement = infoPane.querySelector('#content');
-            const notesElement = infoPane.querySelector('textarea');
-            const deleteButton = infoPane.querySelector('#delete-button');
-            const closeButton = infoPane.querySelector('#close-button');
-            const categoryDropdown = infoPane.querySelector('select');
-    
-            if (showAll) {
-                // Show title, hide content
-                titleElement.style.display = 'block';
-                contentElement.style.display = 'none';
-                infoPane.style.display = 'block';
-            } else {
-                // Hide all
-                titleElement.style.display = 'none';
-                contentElement.style.display = 'none';
-                infoPane.style.display = 'none';
-            }
-            updateInfoPanesPositions();
-        });
-    }
-
     // Create toggle all info panes button
     const toggleAllInfoPanesButton = document.createElement('button');
     toggleAllInfoPanesButton.textContent = 'Show All Titles';
@@ -158,6 +120,38 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleAllInfoPanesButton.style.backgroundColor = showAllInfoPanes ? '#f44336' : '#2196F3';
         updateInfoPaneVisibility(showAllInfoPanes);
     });
+
+    // Orbit controls
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+    //controls.dampingFactor = 0.05;
+    //controls.screenSpacePanning = false;
+    //controls.minDistance = 5;
+    //controls.maxDistance = 50; // Increased max distance
+    
+    // Store all nodes for selection
+    const nodes = [];
+
+    let showAllInfoPanes = false;
+
+    // Function to update info pane visibility
+    function updateInfoPaneVisibility(showAll) {
+        infoPanes.forEach((infoPane, node) => {
+            const titleElement = infoPane.querySelector('#title');
+            const contentElement = infoPane.querySelector('#content');
+    
+            if (showAll) {
+                // Show title, hide content
+                titleElement.style.display = 'block';
+                contentElement.style.display = 'none';
+                infoPane.style.display = 'block';
+            } else {
+                // Hide all
+                infoPane.style.display = 'none';
+            }
+            updateInfoPanesPositions();
+        });
+    }
 
     // Room setup (simple box)
     const roomSize = 30; // Increased room size
@@ -252,6 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Create title based on node category
         const titleSpace = document.createElement('div');
         titleSpace.id = 'title';
+        titleSpace.style.display = 'none';
         infoPane.appendChild(titleSpace);
 
         const title = document.createElement('h3');
@@ -265,6 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Create content container
         const content = document.createElement('div');
         content.id = 'content';
+        content.style.display = 'none';
         infoPane.appendChild(content);
 
         // Create category dropdown
@@ -817,6 +813,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (intersects.length > 0) {
             const clickedNode = intersects[0].object;
             activePane = infoPanes.get(clickedNode)
+            const titleElement = activePane.querySelector('#title');
+            const contentElement = activePane.querySelector('#content');
             
             // Handle middle-click for dragging
             if (event.button === 1) {
@@ -870,6 +868,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         activePane.style.display = 'none';
                         activeInfoPane = false;
                     } else {
+                        titleElement.style.display = 'block';
+                        contentElement.style.display = 'block';
                         activePane.style.display = 'block';
                         activeInfoPane = true;
                     }

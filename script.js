@@ -111,6 +111,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let showAllInfoPanes = false;
 
+    // Function to update info pane visibility
+    function updateInfoPaneVisibility(showAll) {
+        infoPanes.forEach((infoPane, node) => {
+            const titleElement = infoPane.querySelector('#title');
+            const contentElement = infoPane.querySelector('#content');
+            const notesElement = infoPane.querySelector('textarea');
+            const deleteButton = infoPane.querySelector('#delete-button');
+            const closeButton = infoPane.querySelector('#close-button');
+            const categoryDropdown = infoPane.querySelector('select');
+    
+            if (showAll) {
+                // Show title, hide content
+                titleElement.style.display = 'block';
+                contentElement.style.display = 'none';
+                infoPane.style.display = 'block';
+            } else {
+                // Hide all
+                titleElement.style.display = 'none';
+                contentElement.style.display = 'none';
+                infoPane.style.display = 'none';
+            }
+            updateInfoPanesPositions();
+        });
+    }
+
     // Create toggle all info panes button
     const toggleAllInfoPanesButton = document.createElement('button');
     toggleAllInfoPanesButton.textContent = 'Show All Titles';
@@ -129,33 +154,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Toggle all info panes
     toggleAllInfoPanesButton.addEventListener('click', () => {
         showAllInfoPanes = !showAllInfoPanes;
-        console.log('Toggling all info panes:', showAllInfoPanes);
         toggleAllInfoPanesButton.textContent = showAllInfoPanes ? 'Show Titles: ON' : 'Show Titles: OFF';
         toggleAllInfoPanesButton.style.backgroundColor = showAllInfoPanes ? '#f44336' : '#2196F3';
-
-        
-        infoPanes.forEach((infoPane, node) => {
-            const titleElement = infoPane.querySelector('h3');
-            const notesElement = infoPane.querySelector('textarea');
-            const deleteButton = infoPane.querySelector('#delete-button');
-            const closeButton = infoPane.querySelector('#close-button');
-            const categoryDropdown = infoPane.querySelector('select');
-    
-            // Always set infoPane to block first
-            infoPane.style.display = 'block';
-    
-            if (showAllInfoPanes) {
-                // Show title, notes, and buttons
-                titleElement.style.display = 'block';
-                notesElement.style.display = 'none';
-                deleteButton.style.display = 'none'; // Or 'block' depending on desired layout
-                closeButton.style.display = 'none'; // Or 'block'
-                categoryDropdown.style.display = 'none';
-            } else {
-                infoPane.style.display = 'none';
-            }
-            updateInfoPanesPositions();
-        });
+        updateInfoPaneVisibility(showAllInfoPanes);
     });
 
     // Room setup (simple box)
@@ -249,14 +250,22 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(infoPane);
         
         // Create title based on node category
+        const titleSpace = document.createElement('div');
+        titleSpace.id = 'title';
+        infoPane.appendChild(titleSpace);
+
         const title = document.createElement('h3');
-        title.id = 'title';
         title.textContent = node.userData.title;
         title.style.margin = '0 0 10px 0';
         title.style.alignContent = 'center';
         title.style.borderBottom = '1px solid rgba(255, 255, 255, 0.3)';
         title.style.paddingBottom = '5px';
-        infoPane.appendChild(title);
+        titleSpace.appendChild(title);
+
+        // Create content container
+        const content = document.createElement('div');
+        content.id = 'content';
+        infoPane.appendChild(content);
 
         // Create category dropdown
         const categoryDropdown = document.createElement('select');
@@ -281,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Set current category as selected
         categoryDropdown.value = node.userData.category;
 
-        infoPane.appendChild(categoryDropdown);
+        content.appendChild(categoryDropdown);
 
         // Category dropdown event listener
         categoryDropdown.addEventListener('change', () => {
@@ -311,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
         notes.style.padding = '5px';
         notes.style.resize = 'vertical';
         notes.style.margin = '5px';
-        infoPane.appendChild(notes);
+        content.appendChild(notes);
         
         // Save notes to node userData when changed
         notes.addEventListener('input', () => {
@@ -329,7 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
         deleteButton.style.padding = '5px 10px';
         deleteButton.style.cursor = 'pointer';
         deleteButton.style.float = 'left';
-        infoPane.appendChild(deleteButton);
+        content.appendChild(deleteButton);
     
         // Delete button event
         deleteButton.addEventListener('click', () => {
@@ -347,7 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
         closeButton.style.padding = '5px 10px';
         closeButton.style.cursor = 'pointer';
         closeButton.style.float = 'right';
-        infoPane.appendChild(closeButton);
+        content.appendChild(closeButton);
         
         // Close button event
         closeButton.addEventListener('click', () => {
@@ -359,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const lastEditedLabel = document.createElement('p');
         lastEditedLabel.textContent = `Last Edited: ${node.userData.lastEdited ? node.userData.lastEdited : 'Not yet edited'}`;
         lastEditedLabel.style.margin = '5px 0';
-        infoPane.appendChild(lastEditedLabel);
+        content.appendChild(lastEditedLabel);
         
         // Store the pane in the map
         infoPanes.set(node, infoPane);
@@ -792,6 +801,8 @@ document.addEventListener('DOMContentLoaded', () => {
         event.preventDefault(); // Prevent the default context menu
     });
 
+    activeInfoPane = false; // Track if an info pane is open
+
     renderer.domElement.addEventListener('mousedown', (event) => {
         // Calculate mouse position in normalized device coordinates
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -805,6 +816,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (intersects.length > 0) {
             const clickedNode = intersects[0].object;
+            activePane = infoPanes.get(clickedNode)
             
             // Handle middle-click for dragging
             if (event.button === 1) {
@@ -854,11 +866,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } else {
                     // Show info pane for the clicked node
-                    if (activeInfoPane || (clickedNode === sourceNode)) {
-                        activeInfoPane.style.display = 'none';
+                    if (activeInfoPane) {
+                        activePane.style.display = 'none';
+                        activeInfoPane = false;
                     } else {
-                        activePane = infoPanes.get(clickedNode);
-                        //Update Here
+                        activePane.style.display = 'block';
+                        activeInfoPane = true;
                     }
                     
                     // Update position
@@ -875,16 +888,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else if (isConnectingMode && sourceNode) {
             // Clicked empty space while in connecting mode with a source node selected
-            // Reset highlight on source node
             sourceNode.material.emissive.setHex(0x000000);
             sourceNode.userData.isHighlighted = false;
             
             // Reset source node
             sourceNode = null;
+            
         } else if (!isConnectingMode && activeInfoPane) {
             // Clicked empty space while info pane is open
-            activeInfoPane.style.display = 'none';
-            activeInfoPane = null;
+            activePane.style.display = 'none';
+            activePane = null;
         }
     });
 

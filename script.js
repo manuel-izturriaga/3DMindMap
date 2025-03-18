@@ -142,9 +142,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
             if (showAll) {
                 // Show title, hide content
-                titleElement.style.display = 'block';
-                contentElement.style.display = 'none';
                 infoPane.style.display = 'block';
+                titleElement.style.display = 'block';
+                //contentElement.style.display = 'block';
+                
             } else {
                 // Hide all
                 infoPane.style.display = 'none';
@@ -261,6 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const content = document.createElement('div');
         content.id = 'content';
         content.style.display = 'none';
+        content.style.border = '1px solid rgba(255, 255, 255, 0.3)';
         infoPane.appendChild(content);
 
         // Create category dropdown
